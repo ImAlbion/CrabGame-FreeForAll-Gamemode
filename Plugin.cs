@@ -1,14 +1,13 @@
 using BepInEx;
 using BepInEx.IL2CPP;
 using CustomGameModes;
-using HarmonyLib;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 
 namespace FreeForAllGameMode
 {
-    [BepInPlugin($"lammas123.ffa{MyPluginInfo.PLUGIN_NAME}", MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin($"Albion.FFA{MyPluginInfo.PLUGIN_NAME}", MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     [BepInDependency("lammas123.CustomGameModes")]
     public class SequencedDropGameMode : BasePlugin
     {
