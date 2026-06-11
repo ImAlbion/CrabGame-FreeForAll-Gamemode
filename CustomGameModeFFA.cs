@@ -1,22 +1,11 @@
-﻿using BepInEx;
-using BepInEx.IL2CPP.Utils;
-using CustomGameModes;
-using HarmonyLib;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
+﻿using HarmonyLib;
 
 namespace FreeForAllGameMode
 {
     public sealed class CustomGameModeFFA : CustomGameModes.CustomGameMode
     {
         internal static CustomGameModeFFA Instance;
-        //internal static GameModeSnowBrawl SnowBrawl;
         internal Harmony patches;
-
-        internal static bool isGameStarted = false;
 
         public CustomGameModeFFA() : base
         (
@@ -24,11 +13,11 @@ namespace FreeForAllGameMode
             description: "• Weapon Given\n\n• You must kill everyone\n\n• Pickup guns of those you killed to reload",
             gameModeType: GameModeType.SnowBrawl,
             vanillaGameModeType: GameModeType.SnowBrawl,
-            waitForRoundOverToDeclareSoloWinner: true,
+            waitForRoundOverToDeclareSoloWinner: false,
 
             shortModeTime: 60,
-            mediumModeTime: 90,
-            longModeTime: 120,
+            mediumModeTime: 80,
+            longModeTime: 100,
 
             compatibleMapNames: [
                 "Bitter Beach",
@@ -64,45 +53,11 @@ namespace FreeForAllGameMode
         {
             if (!SteamManager.Instance.IsLobbyOwner())
                 return false;
-            isGameStarted = true;
 
             GameServer.ForceGiveAllWeapon(0);
             GameServer.ForceGiveAllWeapon(1);
 
             return false;
-        }
-
-        [HarmonyPatch(typeof(GameModeSnowBrawl), nameof(GameModeSnowBrawl.PlayerDied))]
-        [HarmonyPostfix]
-        public static void OnPlayerDied(GameModeSnowBrawl __instance)
-        {
-            if (!SteamManager.Instance.IsLobbyOwner())
-                return;
-            if (!isGameStarted) return;
-            int alivePlayers = GetAlivePlayers().Count;
-
-            if (alivePlayers == 1)
-            {
-                __instance.EndRound();
-                isGameStarted = false;
-                foreach (ulong clientId in GameManager.Instance.activePlayers.Keys)
-                {
-                    string playerName = GameManager.Instance.activePlayers[clientId].username;
-                    ServerSend.SendChatMessage(1, playerName + " Wins");
-                }
-            }
-        }
-
-
-        public static List<ulong> GetAlivePlayers()
-        {
-            List<ulong> list = new();
-            foreach (var player in GameManager.Instance.activePlayers)
-            {
-                if (player == null || player.Value.dead) continue;
-                list.Add(player.Key);
-            }
-            return list;
         }
     }
 }
